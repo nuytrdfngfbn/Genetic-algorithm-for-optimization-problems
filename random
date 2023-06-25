@@ -1,0 +1,46 @@
+# Example using the DEAP library and a genetic algorithm for the knapsack problem
+import random
+from deap import base, creator, tools
+
+# Create a fitness function
+def evaluate(individual):
+    # Calculate the fitness value of the individual
+    fitness = sum(individual)
+    return fitness,
+
+# Create the toolbox
+toolbox = base.Toolbox()
+
+# Define the individual and population
+creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+creator.create("Individual", list, fitness=creator.FitnessMax)
+
+# Register the individual and population in the toolbox
+toolbox.register("attr_bool", random.randint, 0, 1)
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_bool, n=10)
+toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+
+# Register the evaluation function in the toolbox
+toolbox.register("evaluate", evaluate)
+
+# Register the genetic operators in the toolbox
+toolbox.register("mate", tools.cxTwoPoint)
+toolbox.register("mutate", tools.mutFlipBit, indpb=0.05)
+toolbox.register("select", tools.selTournament, tournsize=3)
+
+# Create the population
+population = toolbox.population(n=100)
+
+# Perform the evolution
+for generation in range(50):
+    offspring = algorithms.varAnd(population, toolbox, cxpb=0.5, mutpb=0.1)
+    fits = toolbox.map(toolbox.evaluate, offspring)
+    for fit, ind in zip(fits, offspring):
+        ind.fitness.values = fit
+    population = toolbox.select(offspring, k=len(population))
+
+# Get the best individual
+best_individual = tools.selBest(population, k=1)[0]
+
+# Print the best individual's fitness value
+print("Best fitness value:", best_individual.fitness.values[0])
